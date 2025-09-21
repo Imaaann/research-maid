@@ -1,0 +1,9 @@
+click
+numpy
+scipy
+python-dotenv
+PyMuPDF
+sentence-transformers
+pdfplumber
+pytest
+faiss-cpu   
