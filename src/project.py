@@ -44,3 +44,7 @@ def create_project(project_name: str):
     print(
         f"[research-maid]: Successfully created project {project_name} at {project_dir}"
     )
+
+
+def get_project_dir(project_name: str):
+    return PROJECTS_DIR / project_name
