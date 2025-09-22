@@ -1,4 +1,3 @@
-from sys import meta_path
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from pathlib import Path
@@ -41,3 +40,5 @@ def load_and_split_pdf(file_path: str, chunk_size=200, chunk_overlap=20):
         text = doc.page_content
         metadata = doc.metadata
         output.append((text, metadata))
+
+    return output

@@ -1,9 +1,11 @@
+import numpy as np
 import click
 from click.types import Path
 
-from .vectordb import get_faiss_index
+from .vectordb import embed_texts, get_faiss_index
+
 from .db_utils import init_sqlite_db
-from .pdf_utils import copy_pdf
+from .pdf_utils import copy_pdf, load_and_split_pdf
 from .project import create_project
 
 
@@ -24,17 +26,26 @@ def create(project_name: str):
 @click.argument("project_name")
 @click.argument("pdf_path")
 def add(project_name: str, pdf_path: str):
-    copy_path = copy_pdf(pdf_path, project_name)
-    db_conn = init_sqlite_db(project_name)
+   copy_path = copy_pdf(pdf_path, project_name)
+   db_conn = init_sqlite_db(project_name)
+   try:
+       index = get_faiss_index(project_name)
+       
+       chunks = load_and_split_pdf(str(copy_path))
+       texts = [c[0] for c in chunks]
+       metadatas = [c[1] for c in chunks]
 
-    try:
-       faiss_index = get_faiss_index(project_name)
-    except Exception as e:
-        db_conn.rollback()
-        print(f"ERROR: FAISS Indexing failed: {e}")
-        
+       embeddings = embed_texts(texts)
 
-   
+       cursor = db_conn.cursor()
+       vectors = np.array(embeddings, dtype="float32")
+
+       __import__('pprint').pprint(texts)
+    
+    
+   except Exception as e:
+       db_conn.rollback()
+       print(f"ERROR: Adding document failed: {e}")
 
 @cli.command()
 @click.argument("project_name")

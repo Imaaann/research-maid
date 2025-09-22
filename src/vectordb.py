@@ -2,12 +2,13 @@ import json
 import faiss
 import pickle
 import numpy as np
+from sentence_transformers import SentenceTransformer
 from .db_utils import get_connection
 from .project import get_project_dir
 
 _index = None
 _metadata = []
-
+_model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
 
 def query_index(project_name: str, query_embdedding: list[float], top_k: int = 5):
     index = get_faiss_index(project_name)
@@ -90,3 +91,10 @@ def save_index(project_name: str):
     with open(str(metadata_path), "wb") as f:
         pickle.dump(_metadata, f)
     print("INFO: Faiss index saved to disk...")
+
+
+def embed_texts(texts: list[str]) -> list[list[float]]:
+    return _model.encode(texts, convert_to_numpy=True).tolist()
+
+def embed_query(query: str): 
+    return embed_texts([query])[0]
