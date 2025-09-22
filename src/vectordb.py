@@ -1,4 +1,5 @@
 import json
+from annotated_types import doc
 import faiss
 import pickle
 import numpy as np
@@ -8,7 +9,10 @@ from .project import get_project_dir
 
 _index = None
 _metadata = []
-_model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+_model = SentenceTransformer(
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+)
+
 
 def query_index(project_name: str, query_embdedding: list[float], top_k: int = 5):
     index = get_faiss_index(project_name)
@@ -25,19 +29,22 @@ def query_index(project_name: str, query_embdedding: list[float], top_k: int = 5
     for doc_id, dist in zip(I[0], D[0]):
         if doc_id == -1:
             continue
-        cursor.execute("SELECT text, metadata FROM chunks WHERE id = ?", int(doc_id))
+        cursor.execute("SELECT text, metadata FROM chunks WHERE id = ?", (int(doc_id),))
+        print(doc_id)
         row = cursor.fetchone()
+        print(row)
         if row:
-            text, metadata_json = row
-            metadata = json.loads(metadata_json)
+            text, metadata = row
+            metadata_json = json.loads(metadata)
             results.append(
                 {
                     "id": int(doc_id),
                     "text": text,
-                    "metadata": metadata,
+                    "metadata": metadata_json,
                     "distance": float(dist),
                 }
             )
+    return results
 
 
 def get_faiss_index(project_name: str, dim: int = 384):
@@ -96,5 +103,6 @@ def save_index(project_name: str):
 def embed_texts(texts: list[str]) -> list[list[float]]:
     return _model.encode(texts, convert_to_numpy=True).tolist()
 
-def embed_query(query: str): 
+
+def embed_query(query: str):
     return embed_texts([query])[0]

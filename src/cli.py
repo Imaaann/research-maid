@@ -3,7 +3,7 @@ import numpy as np
 import click
 from click.types import Path
 
-from .vectordb import embed_texts, get_faiss_index, save_index
+from .vectordb import embed_query, embed_texts, get_faiss_index, query_index, save_index
 from .db_utils import init_sqlite_db
 from .pdf_utils import copy_pdf, load_and_split_pdf
 from .project import create_project
@@ -61,13 +61,21 @@ def add(project_name: str, pdf_path: str):
 
 @cli.command()
 @click.argument("project_name")
-@click.argument("target_pdf", type=click.Path(exists=True, path_type=Path))
-@click.option(
-    "--threshold", "-t", default=0.6, help="Similarity threshold (default: 0.6)"
-)
-def cite(project_name: str, target_pdf: Path, threshold: float):
+@click.argument("target_pdf")
+def cite(project_name: str, target_pdf: str):
     """Cite a target PDF using project sources."""
-    print(f"project {project_name}, file: {target_pdf.name}, threshold: {threshold}")
+    init_sqlite_db(project_name)
+    chunks = load_and_split_pdf(target_pdf)
+    texts = [c[0] for c in chunks]
+    for text in texts:
+        emb = embed_query(text)
+        hits = query_index(project_name, emb)
+        print("========== NEW TEXT CHUNK ============")
+        print("\n\n\nHITS: ")
+        __import__("pprint").pprint(hits)
+
+        # print("\n\n\nTEXT CHUNK: ")
+        # __import__("pprint").pprint(text)
 
 
 if __name__ == "__main__":
