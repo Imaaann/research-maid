@@ -1,6 +1,7 @@
 import click
 from click.types import Path
 
+from .pdf_utils import copy_pdf
 from .project import create_project
 
 
@@ -19,10 +20,10 @@ def create(project_name: str):
 
 @cli.command()
 @click.argument("project_name")
-@click.argument("pdf_path", type=click.Path(exists=True, path_type=Path))
-def add(project_name: str, pdf_path: Path):
+@click.argument("pdf_path")
+def add(project_name: str, pdf_path: str):
     """Add a source PDF to a project."""
-    print(f"Added to project {project_name}: file:{pdf_path}")
+    copy_pdf(pdf_path, project_name)
 
 
 @cli.command()
