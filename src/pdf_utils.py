@@ -19,3 +19,4 @@ def copy_pdf(pdf_path: str, project_name: str):
         raise FileExistsError(f"file already exists: {target}")
 
     shutil.copy2(source, target)
+    return target
