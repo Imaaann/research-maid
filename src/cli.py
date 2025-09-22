@@ -53,10 +53,12 @@ def add(project_name: str, pdf_path: str):
 
         db_conn.commit()
         save_index(project_name)
-
+        print(
+            f"[research-maid]: Successfully Indexed new PDF in project {project_name}"
+        )
     except Exception as e:
         db_conn.rollback()
-        print(f"ERROR: Adding document failed: {e}")
+        print(f"Error while indexing file: {e}")
 
 
 @cli.command()
@@ -70,12 +72,6 @@ def cite(project_name: str, target_pdf: str):
     for text in texts:
         emb = embed_query(text)
         hits = query_index(project_name, emb)
-        print("========== NEW TEXT CHUNK ============")
-        print("\n\n\nHITS: ")
-        __import__("pprint").pprint(hits)
-
-        # print("\n\n\nTEXT CHUNK: ")
-        # __import__("pprint").pprint(text)
 
 
 if __name__ == "__main__":

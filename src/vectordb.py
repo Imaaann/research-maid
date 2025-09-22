@@ -30,9 +30,7 @@ def query_index(project_name: str, query_embdedding: list[float], top_k: int = 5
         if doc_id == -1:
             continue
         cursor.execute("SELECT text, metadata FROM chunks WHERE id = ?", (int(doc_id),))
-        print(doc_id)
         row = cursor.fetchone()
-        print(row)
         if row:
             text, metadata = row
             metadata_json = json.loads(metadata)
@@ -59,10 +57,8 @@ def get_faiss_index(project_name: str, dim: int = 384):
         return _index
 
     if index_path.exists():
-        print("INFO: Loading Faiss index from disk...")
         _index = faiss.read_index(str(index_path))
     else:
-        print("INFO: Creating new Faiss index")
         _index = faiss.IndexIDMap2(faiss.IndexFlatL2(dim))
 
     if metadata_path.exists():
@@ -97,7 +93,6 @@ def save_index(project_name: str):
     faiss.write_index(_index, str(index_path))
     with open(str(metadata_path), "wb") as f:
         pickle.dump(_metadata, f)
-    print("INFO: Faiss index saved to disk...")
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
