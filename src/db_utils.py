@@ -1,9 +1,8 @@
-import json
 from pathlib import Path
 import sqlite3
-from typing import Dict, Optional
+from typing import Optional
 
-from project import get_project_dir
+from .project import get_project_dir
 
 _db_conn: Optional[sqlite3.Connection] = None
 _db_path: Optional[Path] = None

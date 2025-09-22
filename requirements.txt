@@ -6,4 +6,6 @@ PyMuPDF
 sentence-transformers
 pdfplumber
 pytest
-faiss-cpu   
+faiss-cpu
+langchain_community
+langchain_text_splitters

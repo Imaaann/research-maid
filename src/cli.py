@@ -1,6 +1,8 @@
 import click
 from click.types import Path
 
+from .vectordb import get_faiss_index
+from .db_utils import init_sqlite_db
 from .pdf_utils import copy_pdf
 from .project import create_project
 
@@ -22,9 +24,17 @@ def create(project_name: str):
 @click.argument("project_name")
 @click.argument("pdf_path")
 def add(project_name: str, pdf_path: str):
-    """Add a source PDF to a project."""
-    copy_pdf(pdf_path, project_name)
+    copy_path = copy_pdf(pdf_path, project_name)
+    db_conn = init_sqlite_db(project_name)
 
+    try:
+       faiss_index = get_faiss_index(project_name)
+    except Exception as e:
+        db_conn.rollback()
+        print(f"ERROR: FAISS Indexing failed: {e}")
+        
+
+   
 
 @cli.command()
 @click.argument("project_name")

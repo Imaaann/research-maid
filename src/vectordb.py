@@ -2,8 +2,8 @@ import json
 import faiss
 import pickle
 import numpy as np
-from db_utils import get_connection
-from project import get_project_dir
+from .db_utils import get_connection
+from .project import get_project_dir
 
 _index = None
 _metadata = []
