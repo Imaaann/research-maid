@@ -15,9 +15,7 @@ def copy_pdf(pdf_path: str, project_name: str):
     project_dir = get_project_dir(project_name)
     target = project_dir / "documents" / source.name
 
-    counter = 1
-    while target.exists():
-        target = project_dir / f"{source.stem}_{counter}{source.suffix}"
-        counter += 1
+    if target.exists():
+        raise FileExistsError(f"file already exists: {target}")
 
     shutil.copy2(source, target)
