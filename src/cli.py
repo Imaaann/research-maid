@@ -27,7 +27,7 @@ def add(project_name: str, pdf_path: Path):
 @click.option("--threshold", "-t", default=0.6, help="Similarity threshold (default: 0.6)")
 def cite(project_name: str, target_pdf: Path, threshold: float):
     """Cite a target PDF using project sources."""
-    print(f"project {project_name}, file: {target_pdf}, threshold: {threshold}")
+    print(f"project {project_name}, file: {target_pdf.name}, threshold: {threshold}")
 
 if __name__ == "__main__":
     cli()
