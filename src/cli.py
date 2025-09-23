@@ -1,8 +1,9 @@
 import json
 import numpy as np
 import click
-from click.types import Path
+from torch import chunk
 
+from .html_review import write_citation_review_files
 from .vectordb import embed_query, embed_texts, get_faiss_index, query_index, save_index
 from .db_utils import init_sqlite_db
 from .pdf_utils import copy_pdf, load_and_split_pdf
@@ -40,7 +41,7 @@ def add(project_name: str, pdf_path: str):
         cursor = db_conn.cursor()
         vectors = np.array(embeddings, dtype="float32")
 
-        for idx, (text, meta, vec) in enumerate(zip(texts, metadatas, vectors)):
+        for text, meta, vec in zip(texts, metadatas, vectors):
             meta_json = json.dumps(meta)
             cursor.execute(
                 "INSERT INTO chunks (text, metadata) VALUES (?, ?)", (text, meta_json)
@@ -69,9 +70,15 @@ def cite(project_name: str, target_pdf: str):
     init_sqlite_db(project_name)
     chunks = load_and_split_pdf(target_pdf)
     texts = [c[0] for c in chunks]
+    hits_per_chunk = []
     for text in texts:
         emb = embed_query(text)
         hits = query_index(project_name, emb)
+        hits_per_chunk.append(hits)
+    index_html = write_citation_review_files(
+        project_name, target_pdf, chunks, hits_per_chunk
+    )
+    print("Wrote review UI to:", index_html)
 
 
 if __name__ == "__main__":

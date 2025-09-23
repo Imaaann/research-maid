@@ -14,7 +14,7 @@ _model = SentenceTransformer(
 )
 
 
-def query_index(project_name: str, query_embdedding: list[float], top_k: int = 5):
+def query_index(project_name: str, query_embdedding: list[float], top_k: int = 3):
     index = get_faiss_index(project_name)
     metadata = get_metadata()
     db_conn = get_connection()
